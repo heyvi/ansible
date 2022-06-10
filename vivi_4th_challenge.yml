@@ -1,0 +1,33 @@
+# ansible challenge_4
+---
+- hosts: localhost
+  tasks:
+  - name: Download poly files
+    get_url:
+      url: https://data.gov.sg/dataset/f6048a81-0f7b-436c-8bfa-ebe1bb42cfdc/download
+      dest: ./poly.zip
+  - name: Download uni files
+    get_url:
+      url: https://data.gov.sg/dataset/249f1149-1e04-40e2-81c6-bfab3bba5574/download
+      dest: ./uni.zip
+
+  - name: Unzip poly & uni files
+    unarchive: src={{item.src}} dest={{item.dest}}
+    remote_src: yes
+    with_items:
+      - {
+          src: "./poly.zip" ,
+          dest: "./"
+        }
+      - {
+          src: "./uni.zip" ,
+          dest: "./"
+        }
+
+  - name: calculate and print value using python script
+    shell: "python3 ./datafilter.py"
+    register: output
+  
+  - name: print outout
+    debug:
+      msg: "{{ output.stdout }}"
